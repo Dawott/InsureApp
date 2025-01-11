@@ -10,6 +10,6 @@
         public string Username { get; set; }
         public string PasswordHash { get; set; }
 
-        public virtual ICollection<InsuranceReport> HandledReports { get; set; }
+        public virtual ICollection<InsuranceReport>? HandledReports { get; set; }
     }
 }

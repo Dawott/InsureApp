@@ -1,4 +1,13 @@
+using InsureApp.Server.Model;
+using Microsoft.EntityFrameworkCore;
+
 var builder = WebApplication.CreateBuilder(args);
+
+var dbConnectionsString = builder.Configuration.GetConnectionString("InsureApp");
+builder.Services.AddDbContext<InsuranceDbContext>((options) =>
+{
+    options.UseSqlServer(dbConnectionsString);
+});
 
 // Add services to the container.
 

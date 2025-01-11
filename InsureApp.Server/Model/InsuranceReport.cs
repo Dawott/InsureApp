@@ -6,21 +6,20 @@ namespace InsureApp.Server.Model
     {
         public int Id { get; set; }
         public DateTime SubmissionDate { get; set; }
-        public string Status { get; set; } 
-        public decimal RequestedCoverageAmount { get; set; }
+        public required string Status { get; set; } 
         public string? AdditionalNotes { get; set; }
 
-        [ForeignKey(nameof(EndUserId))]
+        [ForeignKey("EndUserId")]
         public int EndUserId { get; set; }
-        [ForeignKey(nameof(InsuranceAgentId))]
+        [ForeignKey("InsuranceAgentId")]
         public int? InsuranceAgentId { get; set; }
-        [ForeignKey(nameof(InsuranceTypeId))]
+        [ForeignKey("InsuranceTypeId")]
         public int InsuranceTypeId { get; set; }
 
-        public virtual EndUser EndUser { get; set; }
+        public required virtual EndUser EndUser { get; set; }
         public virtual InsuranceAgent? InsuranceAgent { get; set; }
-        public virtual InsuranceType InsuranceType { get; set; }
+        public required virtual InsuranceType InsuranceType { get; set; }
 
-        public virtual ICollection<InsuranceDocument> Documents { get; set; }
+        public virtual ICollection<InsuranceDocument>? Documents { get; set; }
     }
 }

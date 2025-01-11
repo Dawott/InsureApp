@@ -11,7 +11,7 @@ namespace InsureApp.Server.Model
         public string FileType { get; set; }
         public DateTime UploadDate { get; set; }
 
-        [ForeignKey(nameof(InsuranceReportId))]
+        [ForeignKey("InsuranceReportId")]
         public int InsuranceReportId { get; set; }
         public virtual InsuranceReport InsuranceReport { get; set; }
     }
