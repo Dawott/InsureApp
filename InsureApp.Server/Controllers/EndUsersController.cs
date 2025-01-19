@@ -15,10 +15,12 @@ namespace InsureApp.Server.Controllers
     public class EndUsersController : ControllerBase
     {
         private readonly InsuranceDbContext _db;
+       //private readonly ILogger<EndUsersController> _logger;
 
         public EndUsersController(InsuranceDbContext context)
         {
             _db = context;
+            //_logger = logger;
         }
 
        
@@ -54,6 +56,31 @@ namespace InsureApp.Server.Controllers
             }
 
             return endUser;
+        }
+
+        [HttpGet]
+        [ActionName("GetUserID")]
+        public async Task<ActionResult<EndUser>> GetUserByName([FromQuery] string firstName, [FromQuery] string lastName)
+        {
+            try
+            {
+                if(firstName == null || lastName == null)
+                {
+                    return BadRequest(new { message = "Proszę podać imię i nazwisko" });
+                }
+
+                var user = await _db.EndUsers.FirstOrDefaultAsync(u => u.FirstName.ToLower() == firstName.ToLower() && u.LastName.ToLower() == lastName.ToLower());
+
+                if (user == null)
+                {
+                    return NotFound(new { message = $"Nie ma użytkownika o danych {firstName} {lastName}"});
+                }
+                return Ok(user);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Błąd ze strony serwera! Powód:",ex});
+            }
         }
 
         // PUT: api/EndUsers/5
