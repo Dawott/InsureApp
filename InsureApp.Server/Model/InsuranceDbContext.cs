@@ -15,7 +15,15 @@ namespace InsureApp.Server.Model
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
-            
+
+            modelBuilder.Entity<EndUser>()
+                .HasIndex(u => u.Username)
+                .IsUnique();
+
+            modelBuilder.Entity<EndUser>()
+                .HasIndex(u => u.Email)
+                .IsUnique();
+
             modelBuilder.Entity<InsuranceReport>()
                 .HasOne(x => x.EndUser)
                 .WithMany(u => u.InsuranceReports)

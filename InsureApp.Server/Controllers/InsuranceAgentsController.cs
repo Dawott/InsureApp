@@ -9,36 +9,73 @@ using InsureApp.Server.Model;
 
 namespace InsureApp.Server.Controllers
 {
-    [Route("api/[controller]")]
+
+    [Route("api/[controller]/[action]")]
     [ApiController]
     public class InsuranceAgentsController : ControllerBase
     {
-        private readonly InsuranceDbContext _context;
+        private readonly InsuranceDbContext _db;
+        private readonly ILogger<InsuranceAgentsController> _logger;
 
-        public InsuranceAgentsController(InsuranceDbContext context)
+        public InsuranceAgentsController(InsuranceDbContext context, ILogger<InsuranceAgentsController> logger)
         {
-            _context = context;
+            _db = context;
+            _logger = logger;
         }
 
         // GET: api/InsuranceAgents
         [HttpGet]
+        [ActionName("GetAllAgents")]
         public async Task<ActionResult<IEnumerable<InsuranceAgent>>> GetInsuranceAgents()
         {
-            return await _context.InsuranceAgents.ToListAsync();
+            try
+            {
+                var users = await _db.InsuranceAgents.ToListAsync();
+                return Ok(new ApiResponse<IEnumerable<InsuranceAgent>>
+                {
+                    Success = true,
+                    Data = users,
+                    Message = "Zwrócono wszystkich użytkowników"
+
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Błąd przy zwracaniu użytkowników");
+                return StatusCode(500, new ApiResponse<IEnumerable<InsuranceAgent>>
+                {
+                    Success = false,
+                    Message = $"Błąd serwera podczas zwracania użytkowników. Szczegóły: {ex}"
+                }
+                    );
+            }
         }
 
         // GET: api/InsuranceAgents/5
         [HttpGet("{id}")]
+        [ActionName("GetAgentByID")]
         public async Task<ActionResult<InsuranceAgent>> GetInsuranceAgent(int id)
         {
-            var insuranceAgent = await _context.InsuranceAgents.FindAsync(id);
+            var endUser = await _db.EndUsers.FindAsync(id);
 
-            if (insuranceAgent == null)
+
+            if (endUser == null)
             {
-                return NotFound();
+                return NotFound(new ApiResponse<object>
+                {
+                    Success = false,
+                    Message = $"Nie odnalazłem użytkownika o ID {id}"
+                });
             }
-
-            return insuranceAgent;
+            else
+            {
+                return Ok(new ApiResponse<EndUser>
+                {
+                    Success = true,
+                    Message = $"Użytkownik o {id} znaleziony",
+                    Data = endUser
+                });
+            }
         }
 
         // PUT: api/InsuranceAgents/5
@@ -51,11 +88,11 @@ namespace InsureApp.Server.Controllers
                 return BadRequest();
             }
 
-            _context.Entry(insuranceAgent).State = EntityState.Modified;
+            _db.Entry(insuranceAgent).State = EntityState.Modified;
 
             try
             {
-                await _context.SaveChangesAsync();
+                await _db.SaveChangesAsync();
             }
             catch (DbUpdateConcurrencyException)
             {
@@ -73,12 +110,11 @@ namespace InsureApp.Server.Controllers
         }
 
         // POST: api/InsuranceAgents
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
         public async Task<ActionResult<InsuranceAgent>> PostInsuranceAgent(InsuranceAgent insuranceAgent)
         {
-            _context.InsuranceAgents.Add(insuranceAgent);
-            await _context.SaveChangesAsync();
+            _db.InsuranceAgents.Add(insuranceAgent);
+            await _db.SaveChangesAsync();
 
             return CreatedAtAction("GetInsuranceAgent", new { id = insuranceAgent.Id }, insuranceAgent);
         }
@@ -87,21 +123,21 @@ namespace InsureApp.Server.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteInsuranceAgent(int id)
         {
-            var insuranceAgent = await _context.InsuranceAgents.FindAsync(id);
+            var insuranceAgent = await _db.InsuranceAgents.FindAsync(id);
             if (insuranceAgent == null)
             {
                 return NotFound();
             }
 
-            _context.InsuranceAgents.Remove(insuranceAgent);
-            await _context.SaveChangesAsync();
+            _db.InsuranceAgents.Remove(insuranceAgent);
+            await _db.SaveChangesAsync();
 
             return NoContent();
         }
 
         private bool InsuranceAgentExists(int id)
         {
-            return _context.InsuranceAgents.Any(e => e.Id == id);
+            return _db.InsuranceAgents.Any(e => e.Id == id);
         }
     }
 }

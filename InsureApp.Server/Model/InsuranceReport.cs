@@ -7,6 +7,8 @@ namespace InsureApp.Server.Model
         public int Id { get; set; }
         public DateTime SubmissionDate { get; set; }
         public required string Status { get; set; } 
+        public required string Description { get; set; }
+        public string? DecisionReason { get; set; }
         public string? AdditionalNotes { get; set; }
 
         [ForeignKey("EndUserId")]
