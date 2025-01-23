@@ -16,6 +16,10 @@ namespace InsureApp.Server.Model
         {
             base.OnModelCreating(modelBuilder);
 
+            modelBuilder.Entity<InsuranceType>()
+                .HasIndex(u => u.Name)
+                .IsUnique();
+
             modelBuilder.Entity<EndUser>()
                 .HasIndex(u => u.Username)
                 .IsUnique();
@@ -23,6 +27,15 @@ namespace InsureApp.Server.Model
             modelBuilder.Entity<EndUser>()
                 .HasIndex(u => u.Email)
                 .IsUnique();
+
+            modelBuilder.Entity<InsuranceAgent>()
+                .HasIndex(u => u.Username)
+                .IsUnique();
+
+            modelBuilder.Entity<InsuranceAgent>()
+                .HasIndex(u => u.Email)
+                .IsUnique();
+
 
             modelBuilder.Entity<InsuranceReport>()
                 .HasOne(x => x.EndUser)
