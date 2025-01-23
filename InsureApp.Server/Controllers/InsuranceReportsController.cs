@@ -9,99 +9,221 @@ using InsureApp.Server.Model;
 
 namespace InsureApp.Server.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/[controller]/[action]")]
     [ApiController]
     public class InsuranceReportsController : ControllerBase
     {
         private readonly InsuranceDbContext _context;
+        private readonly ILogger<InsuranceReportsController> _logger;
 
-        public InsuranceReportsController(InsuranceDbContext context)
+        public InsuranceReportsController(InsuranceDbContext context, ILogger<InsuranceReportsController> logger)
         {
             _context = context;
+            _logger = logger;
         }
 
         // GET: api/InsuranceReports
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<InsuranceReport>>> GetInsuranceReports()
+        [ActionName("GetAllReports")]
+        public async Task<ActionResult<ApiResponse<IEnumerable<InsuranceReport>>>> GetInsuranceReports()
         {
-            return await _context.InsuranceReports.ToListAsync();
+            try
+            {
+                var reports = await _context.InsuranceReports
+                    .Include(r => r.InsuranceType)
+                    .Include(r => r.EndUser)
+                    .Include(r => r.InsuranceAgent)
+                    .ToListAsync();
+
+                return Ok(new ApiResponse<IEnumerable<InsuranceReport>>
+                {
+                    Success = true,
+                    Data = reports,
+                    Message = "Zwrócono raporty"
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Błąd GET");
+                return StatusCode(500, new ApiResponse<IEnumerable<InsuranceReport>>
+                {
+                    Success = false,
+                    Message = "Błąd odczytu raportów"
+                });
+            }
         }
 
-        // GET: api/InsuranceReports/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<InsuranceReport>> GetInsuranceReport(int id)
+        [ActionName("GetReportByID")]
+        public async Task<ActionResult<ApiResponse<InsuranceReport>>> GetInsuranceReport(int id)
         {
-            var insuranceReport = await _context.InsuranceReports.FindAsync(id);
-
-            if (insuranceReport == null)
+            try
             {
-                return NotFound();
-            }
+                var report = await _context.InsuranceReports
+                    .Include(r => r.InsuranceType)
+                    .Include(r => r.EndUser)
+                    .Include(r => r.InsuranceAgent)
+                    .Include(r => r.Documents)
+                    .FirstOrDefaultAsync(r => r.Id == id);
 
-            return insuranceReport;
+                if (report == null)
+                {
+                    return NotFound(new ApiResponse<InsuranceReport>
+                    {
+                        Success = false,
+                        Message = $"Raport o ID {id} nie został znaleziony"
+                    });
+                }
+
+                return Ok(new ApiResponse<InsuranceReport>
+                {
+                    Success = true,
+                    Data = report,
+                    Message = "Raport zwrócono poprawnie"
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Błąd podczas zwracania raportu o ID {id}");
+                return StatusCode(500, new ApiResponse<InsuranceReport>
+                {
+                    Success = false,
+                    Message = "Błąd podczas zwracania pojedynczego raportu"
+                });
+            }
         }
 
-        // PUT: api/InsuranceReports/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutInsuranceReport(int id, InsuranceReport insuranceReport)
+        [HttpPost]
+        [ActionName("CreateReport")]
+        public async Task<ActionResult<ApiResponse<InsuranceReport>>> PostInsuranceReport(InsuranceReport report)
         {
-            if (id != insuranceReport.Id)
+            try
             {
-                return BadRequest();
-            }
+                if (!await _context.EndUsers.AnyAsync(u => u.Id == report.EndUserId))
+                {
+                    return BadRequest(new ApiResponse<InsuranceReport>
+                    {
+                        Success = false,
+                        Message = "Błędne ID klienta"
+                    });
+                }
 
-            _context.Entry(insuranceReport).State = EntityState.Modified;
+                if (!await _context.InsuranceTypes.AnyAsync(t => t.Id == report.InsuranceTypeId))
+                {
+                    return BadRequest(new ApiResponse<InsuranceReport>
+                    {
+                        Success = false,
+                        Message = "Błędny typ ubezpieczenia"
+                    });
+                }
+
+                report.SubmissionDate = DateTime.UtcNow;
+                report.Status = "New";
+
+                _context.InsuranceReports.Add(report);
+                await _context.SaveChangesAsync();
+
+                return CreatedAtAction("CreateReport",
+                    new { id = report.Id },
+                    new ApiResponse<InsuranceReport>
+                    {
+                        Success = true,
+                        Data = report,
+                        Message = "Utworzono raport!"
+                    });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Błąd przy tworzeniu raport");
+                return StatusCode(500, new ApiResponse<InsuranceReport>
+                {
+                    Success = false,
+                    Message = "Błąd przy tworzeniu raportu"
+                });
+            }
+        }
+
+        [HttpPut("{id}")]
+        [ActionName("EditReport")]
+        public async Task<ActionResult<ApiResponse<InsuranceReport>>> PutInsuranceReport(int id, InsuranceReport report)
+        {
+            if (id != report.Id)
+                return BadRequest(new ApiResponse<InsuranceReport>
+                {
+                    Success = false,
+                    Message = "Błędne ID"
+                });
 
             try
             {
+                var existingReport = await _context.InsuranceReports.FindAsync(id);
+                if (existingReport == null)
+                    return NotFound(new ApiResponse<InsuranceReport>
+                    {
+                        Success = false,
+                        Message = "Nie znaleziono raportu"
+                    });
+
+                // Preserve original submission date and end user
+                report.SubmissionDate = existingReport.SubmissionDate;
+                report.EndUserId = existingReport.EndUserId;
+
+                _context.Entry(existingReport).CurrentValues.SetValues(report);
                 await _context.SaveChangesAsync();
+
+                return Ok(new ApiResponse<InsuranceReport>
+                {
+                    Success = true,
+                    Data = report,
+                    Message = "Edycja raportu zakończona sukcesem"
+                });
             }
-            catch (DbUpdateConcurrencyException)
+            catch (Exception ex)
             {
-                if (!InsuranceReportExists(id))
+                _logger.LogError(ex, $"Błąd przy edycji raportu {id}");
+                return StatusCode(500, new ApiResponse<InsuranceReport>
                 {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
+                    Success = false,
+                    Message = "Błąd przy edycji raportu"
+                });
             }
-
-            return NoContent();
         }
 
-        // POST: api/InsuranceReports
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPost]
-        public async Task<ActionResult<InsuranceReport>> PostInsuranceReport(InsuranceReport insuranceReport)
-        {
-            _context.InsuranceReports.Add(insuranceReport);
-            await _context.SaveChangesAsync();
-
-            return CreatedAtAction("GetInsuranceReport", new { id = insuranceReport.Id }, insuranceReport);
-        }
-
-        // DELETE: api/InsuranceReports/5
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteInsuranceReport(int id)
+        [ActionName("DeleteReport")]
+        public async Task<ActionResult<ApiResponse<object>>> DeleteInsuranceReport(int id)
         {
-            var insuranceReport = await _context.InsuranceReports.FindAsync(id);
-            if (insuranceReport == null)
+            try
             {
-                return NotFound();
+                var report = await _context.InsuranceReports
+                    .Include(r => r.Documents)
+                    .FirstOrDefaultAsync(r => r.Id == id);
+
+                if (report == null)
+                    return NotFound(new ApiResponse<object>
+                    {
+                        Success = false,
+                        Message = "Raport nieodnaleziony"
+                    });
+
+                _context.InsuranceReports.Remove(report);
+                await _context.SaveChangesAsync();
+
+                return Ok(new ApiResponse<object>
+                {
+                    Success = true,
+                    Message = "Raport skasowano"
+                });
             }
-
-            _context.InsuranceReports.Remove(insuranceReport);
-            await _context.SaveChangesAsync();
-
-            return NoContent();
-        }
-
-        private bool InsuranceReportExists(int id)
-        {
-            return _context.InsuranceReports.Any(e => e.Id == id);
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Błąd przy usunięciu raportu {id}");
+                return StatusCode(500, new ApiResponse<object>
+                {
+                    Success = false,
+                    Message = "Błąd przy usuwaniu raportu"
+                });
+            }
         }
     }
 }

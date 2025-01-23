@@ -153,7 +153,6 @@ namespace InsureApp.Server.Controllers
         }
 
         // POST: api/InsuranceTypes
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
         [ActionName("CreateType")]
         public async Task<ActionResult<ApiResponse<InsuranceType>>> PostInsuranceType(InsuranceType insuranceType)
@@ -182,7 +181,7 @@ namespace InsureApp.Server.Controllers
                 _context.InsuranceTypes.Add(insuranceType);
                 await _context.SaveChangesAsync();
 
-                return CreatedAtAction(nameof(GetInsuranceType), new { id = insuranceType.Id }, new ApiResponse<InsuranceType>
+                return CreatedAtAction("CreateType", new { id = insuranceType.Id }, new ApiResponse<InsuranceType>
                 {
                     Data = insuranceType,
                     Success = true,

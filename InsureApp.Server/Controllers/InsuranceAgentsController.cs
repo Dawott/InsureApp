@@ -296,7 +296,7 @@ namespace InsureApp.Server.Controllers
                 await _db.SaveChangesAsync();
 
                 return CreatedAtAction(
-                    nameof(GetInsuranceAgent),
+                    "AddAgentManually",
                     new { id = insuranceAgent.Id },
                     new ApiResponse<InsuranceAgent>
                     {

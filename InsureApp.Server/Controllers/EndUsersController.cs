@@ -248,13 +248,12 @@ namespace InsureApp.Server.Controllers
                 return StatusCode(500, new ApiResponse<IEnumerable<InsuranceReport>>
                 {
                     Success = false,
-                    Message = $"Pojawił się błąd {ex.Message}",
-                    Data = null
+                    Message = $"Pojawił się błąd {ex.Message}"
                 });
             }
         }
 
-        // POST: api/EndUsers
+        // POST
         [HttpPost]
         [ActionName("AddUserManually")]
         public async Task<ActionResult<ApiResponse<EndUser>>> PostEndUser(EndUser endUser)
@@ -296,7 +295,7 @@ namespace InsureApp.Server.Controllers
                 await _db.SaveChangesAsync();
 
                 return CreatedAtAction(
-                    nameof(GetEndUser),
+                    "AddUserManually",
                     new { id = endUser.Id },
                     new ApiResponse<EndUser>
                     {
