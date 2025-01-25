@@ -23,7 +23,7 @@ namespace InsureApp.Server.Controllers
             _logger = logger;
         }
 
-        // GET: api/InsuranceAgents
+        // GET
         [HttpGet]
         [ActionName("GetAllAgents")]
         public async Task<ActionResult<ApiResponse<IEnumerable<InsuranceAgent>>>> GetInsuranceAgents()
