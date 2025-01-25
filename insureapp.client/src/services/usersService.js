@@ -1,3 +1,7 @@
+import axios from 'axios';
+
+const API_URL = '/api/EndUsers';
+
 export const usersService = {
   async getAllUsers() {
     const response = await axios.get(`${API_URL}/GetAllCustomers`);
@@ -10,7 +14,7 @@ export const usersService = {
   },
 
   async getUserReports(id) {
-    const response = await axios.get(`${API_URL}/${id}/reports`);
+    const response = await axios.get(`${API_URL}/ShowReportsOf/${id}/reports`);
     return response.data;
   },
 

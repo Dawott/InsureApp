@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = 'api/InsuranceReports';
+const API_URL = '/api/InsuranceReports';
 
 export const reportsService = {
   async getAllReports() {

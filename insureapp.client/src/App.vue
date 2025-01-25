@@ -5,9 +5,9 @@
 </script>
 
 <template>
-  <div class="flex h-screen bg-gray-100">
+  <div class="flex h-screen max-w-screen-xl bg-gray-100">
     <!-- Sidebar -->
-    <aside class="w-64 bg-gray-800 text-white">
+    <aside class="w-56 flex-shrink-0 bg-gray-800 text-white">
       <div class="p-4">
         <h1 class="text-xl font-bold">InsureApp</h1>
       </div>
@@ -58,18 +58,20 @@
     </aside>
 
     <!-- Content -->
-    <main class="flex-1 overflow-y-auto">
+    <main class="flex-1 flex flex-col min-w-0">
       <!-- TOP BAR -->
       <div class="bg-white shadow-sm">
-        <div class="px-4 py-4">
+        <div class="px-6 py-4">
           <h1 class="text-xl font-semibold text-gray-800">Dashboard</h1>
         </div>
       </div>
 
       <!-- Strona z router -->
-      <div class="p-6">
-        <router-view></router-view>
-      </div>
-    </main>
+      <div class="flex-1 p-6 overflow-x-hidden">
+        <div class="max-w-7xl mx-auto w-full">
+          <router-view></router-view>
+        </div>
+        </div>
+</main>
   </div>
 </template>

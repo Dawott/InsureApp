@@ -16,6 +16,7 @@ namespace InsureApp.Server.Model
         [EmailAddress(ErrorMessage = "Błędny format email")]
         public required string Email { get; set; }
         public string? Licence { get; set; }
+        public required bool IsActive { get; set; }
         [Required(ErrorMessage = "Nazwa użytkownika jest wymagana!")]
         public string Username { get; set; }
         public string PasswordHash { get; set; }

@@ -13,6 +13,7 @@
     <Folder Include="src\services\" />
     <Folder Include="src\router\" />
     <Folder Include="src\views\agents\" />
+    <Folder Include="src\views\insurance\" />
     <Folder Include="src\views\users\" />
     <Folder Include="src\views\reports\" />
   </ItemGroup>
