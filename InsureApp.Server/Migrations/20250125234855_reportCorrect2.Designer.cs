@@ -4,6 +4,7 @@ using InsureApp.Server.Model;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace InsureApp.Server.Migrations
 {
     [DbContext(typeof(InsuranceDbContext))]
-    partial class InsuranceDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250125234855_reportCorrect2")]
+    partial class reportCorrect2
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

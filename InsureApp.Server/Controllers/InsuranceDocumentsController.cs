@@ -17,14 +17,16 @@ namespace InsureApp.Server.Controllers
         private readonly InsuranceDbContext _context;
         private readonly IFileService _fileService;
         private readonly string _uploadsFolder;
+        private readonly ILogger<InsuranceDocumentsController> _logger;
 
         public InsuranceDocumentsController(InsuranceDbContext context, IFileService fileService,
-        IConfiguration configuration)
+        IConfiguration configuration, ILogger<InsuranceDocumentsController> logger)
         {
             _context = context;
             _fileService = fileService;
             _uploadsFolder = configuration.GetValue<string>("FileStorage:UploadPath")
                 ?? Path.Combine(Directory.GetCurrentDirectory(), "Uploads");
+            _logger = logger;
         }
 
         // GET
@@ -120,7 +122,8 @@ namespace InsureApp.Server.Controllers
                     FileType = Path.GetExtension(file.FileName),
                     Description = description,
                     UploadDate = DateTime.UtcNow,
-                    InsuranceReportId = reportId
+                    InsuranceReportId = reportId,
+                    InsuranceReport = report
                 };
 
                 _context.InsuranceDocuments.Add(document);
@@ -129,15 +132,17 @@ namespace InsureApp.Server.Controllers
                 return Ok(new ApiResponse<InsuranceDocument>
                 {
                     Success = true,
-                    Data = document
+                    Data = document,
+                    Message = "Dokument załadowany poprawnie"
                 });
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, $"Błąd uploadu pliku do raportu {reportId}");
                 return StatusCode(500, new ApiResponse<InsuranceDocument>
                 {
                     Success = false,
-                    Message = "Błąd przy uploadzie" + ex
+                    Message = "Błąd przy uploadzie" + ex.Message
                 });
             }
         }

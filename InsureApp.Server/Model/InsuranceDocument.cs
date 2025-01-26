@@ -14,6 +14,6 @@ namespace InsureApp.Server.Model
 
         [ForeignKey("InsuranceReportId")]
         public int InsuranceReportId { get; set; }
-        public virtual InsuranceReport InsuranceReport { get; set; }
+        public InsuranceReport InsuranceReport { get; set; }
     }
 }

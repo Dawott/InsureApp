@@ -5,7 +5,7 @@
 </script>
 
 <template>
-  <div class="flex h-screen max-w-screen-xl bg-gray-100">
+  <div class="flex h-screen max-w bg-gray-100">
     <!-- Sidebar -->
     <aside class="w-56 flex-shrink-0 bg-gray-800 text-white">
       <div class="p-4">
@@ -58,20 +58,20 @@
     </aside>
 
     <!-- Content -->
-    <main class="flex-1 flex flex-col min-w-0">
+    <main class="flex w-screen min-w-0">
       <!-- TOP BAR -->
-      <div class="bg-white shadow-sm">
+     <!-- <div class="bg-white shadow-sm">
         <div class="px-6 py-4">
-          <h1 class="text-xl font-semibold text-gray-800">Dashboard</h1>
+          <h1 class="text-xl font-semibold stroke-zinc-700">Dashboard</h1>
         </div>
-      </div>
+      </div>-->
 
       <!-- Strona z router -->
-      <div class="flex-1 p-6 overflow-x-hidden">
-        <div class="max-w-7xl mx-auto w-full">
+      <div class="p-6 flex overflow-x-hidden">
+        <div class="flex-1">
           <router-view></router-view>
         </div>
         </div>
-</main>
+    </main>
   </div>
 </template>

@@ -35,7 +35,7 @@
               <span class="text-sm font-medium text-gray-900">{{ type.name }}</span>
             </td>
             <td class="px-6 py-4">
-              <span class="text-sm text-gray-500">{{ type.description || 'No description provided' }}</span>
+              <span class="text-sm text-gray-500">{{ type.description || 'Brak opisu' }}</span>
             </td>
             <td class="px-6 py-4 whitespace-nowrap">
               <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full"
@@ -47,12 +47,12 @@
               <div class="flex space-x-3">
                 <button @click="editType(type)"
                         class="text-blue-600 hover:text-blue-900">
-                  Edit
+                  Edytuj
                 </button>
                 <button @click="confirmDelete(type)"
                         class="text-red-600 hover:text-red-900"
                         :disabled="hasReports(type)">
-                  Delete
+                  Skasuj
                 </button>
               </div>
             </td>
@@ -70,7 +70,7 @@
               {{ selectedType ? 'Edytuj typ' : 'Stwórz typ' }}
             </h2>
             <button @click="closeModal" class="text-gray-400 hover:text-gray-500">
-              <span class="sr-only">Close</span>
+              <span class="sr-only">Zamknij</span>
               <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
               </svg>
@@ -121,7 +121,7 @@
             <button type="submit"
                     :disabled="modalLoading"
                     class="bg-blue-600 py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50">
-              {{ modalLoading ? 'Saving...' : 'Save' }}
+              {{ modalLoading ? 'Zapisywanie...' : 'Zapisz' }}
             </button>
           </div>
         </form>

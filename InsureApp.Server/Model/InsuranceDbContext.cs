@@ -36,7 +36,6 @@ namespace InsureApp.Server.Model
                 .HasIndex(u => u.Email)
                 .IsUnique();
 
-
             modelBuilder.Entity<InsuranceReport>()
                 .HasOne(x => x.EndUser)
                 .WithMany(u => u.InsuranceReports)

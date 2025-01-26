@@ -124,7 +124,7 @@ export default {
 
     const loadAgents = async () => {
       try {
-        const response = await axios.get('api/InsuranceAgents/GetAllAgents');
+        const response = await axios.get('/api/InsuranceAgents/GetAllAgents');
         if (response.data.success) {
           agents.value = response.data.data;
         }
@@ -142,10 +142,12 @@ export default {
 
         if (response.success) {
           emit('update', response.data);
-          emit('close');
+          //emit('close');
         } else {
           error.value = response.message;
+          return;
         }
+        emit('close');
       } catch (err) {
         error.value = 'Błąd ładowania raportów. Spróbuj ponownie';
         console.error('Błąd:', err);

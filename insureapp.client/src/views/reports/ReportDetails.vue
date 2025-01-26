@@ -85,8 +85,7 @@
               <div class="space-y-2">
                 <p class="text-sm text-gray-600">Przypisany agent</p>
                 <p class="text-sm font-medium text-gray-900">
-                  {{
- report.insuranceAgent ?
+                  {{report.insuranceAgent ?
                   `${report.insuranceAgent.firstName} ${report.insuranceAgent.lastName}` :
                   'Nieprzypisany'
                   }}
@@ -164,13 +163,22 @@ export default {
         error.value = null;
         const response = await reportsService.getReportById(route.params.id);
         if (response.success) {
-          report.value = response.data;
+          report.value = {
+            ...response.data,
+            insuranceAgent: response.data.insuranceAgent || null,
+            endUser: response.data.endUser || null,
+            insuranceType: response.data.insuranceType || null,
+            documents: response.data.documents || []
+            };
+          
         } else {
-          error.value = response.message;
+          error.value = response.message || "Błąd edycji raportu";
+          editMode.value = false;
         }
       } catch (err) {
         error.value = 'Błąd ładowania raportu. Spróbuj ponownie';
         console.error('Błąd:', err);
+        editMode.value = false;
       } finally {
         loading.value = false;
       }
@@ -179,8 +187,9 @@ export default {
     onMounted(() => {
       loadReport();
     });
-    const handleUpdate = (updatedReport) => {
-      report.value = updatedReport;
+    const handleUpdate = async (updatedReport) => {
+      editMode.value = false;
+      await loadReport();
     };
 
     return {

@@ -95,10 +95,20 @@ namespace InsureApp.Server.Controllers
 
         [HttpPost]
         [ActionName("CreateReport")]
-        public async Task<ActionResult<ApiResponse<InsuranceReport>>> PostInsuranceReport(InsuranceReport report)
+        public async Task<ActionResult<ApiResponse<InsuranceReport>>> PostInsuranceReport([FromBody] InsuranceReport report)
         {
             try
             {
+                var endUser = await _context.EndUsers.FindAsync(report.EndUserId);
+                if (endUser == null)
+                {
+                    return BadRequest(new ApiResponse<InsuranceReport>
+                    {
+                        Success = false,
+                        Message = "Błędny EndUserID"
+                    });
+                }
+                /*
                 if (!await _context.EndUsers.AnyAsync(u => u.Id == report.EndUserId))
                 {
                     return BadRequest(new ApiResponse<InsuranceReport>
@@ -106,19 +116,30 @@ namespace InsureApp.Server.Controllers
                         Success = false,
                         Message = "Błędne ID klienta"
                     });
+                }*/
+
+                var insuranceType = await _context.InsuranceTypes.FindAsync(report.InsuranceTypeId);
+                if (insuranceType == null)
+                {
+                    return BadRequest(new ApiResponse<InsuranceReport>
+                    {
+                        Success = false,
+                        Message = "Błędny Typ ID"
+                    });
                 }
 
-                if (!await _context.InsuranceTypes.AnyAsync(t => t.Id == report.InsuranceTypeId))
+                /*if (!await _context.InsuranceTypes.AnyAsync(t => t.Id == report.InsuranceTypeId))
                 {
                     return BadRequest(new ApiResponse<InsuranceReport>
                     {
                         Success = false,
                         Message = "Błędny typ ubezpieczenia"
                     });
-                }
-
+                }*/
+                report.EndUser = endUser;
+                report.InsuranceType = insuranceType;
                 report.SubmissionDate = DateTime.UtcNow;
-                report.Status = "New";
+                report.Status = "Nowy";
 
                 _context.InsuranceReports.Add(report);
                 await _context.SaveChangesAsync();

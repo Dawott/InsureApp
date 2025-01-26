@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
+import NotFound from '../views/NotFound.vue'
 
 const routes = [
   {
@@ -54,6 +55,11 @@ const routes = [
     path: '/insurance-types',
     name: 'InsuranceTypes',
     component: () => import('../views/insurance/InsuranceTypesList.vue')
+  },
+  {
+    path: '/:pathMatch(.*)*',
+    name: 'NotFound',
+    component: NotFound
   }
 ]
 

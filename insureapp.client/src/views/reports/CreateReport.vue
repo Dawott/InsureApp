@@ -1,5 +1,5 @@
 <template>
-  <div class="max-w-4xl mx-auto">
+  <div class="max-w mx-auto">
     <div class="flex justify-between items-center mb-6">
       <h1 class="text-2xl font-semibold text-gray-900">Złóż nowy incydent</h1>
       <router-link to="/reports"
@@ -55,7 +55,7 @@
         </div>
       </div>
 
-      <!-- Documents Section -->
+      <!-- Dokumentacja -->
       <div class="bg-white shadow rounded-lg p-6">
         <h2 class="text-lg font-medium text-gray-900 mb-4">Dokumenty</h2>
         <h4 class="font-thin fill-neutral-300 mb-2">Akceptowane formaty: jpg, png, pdf. Rozmiar poniżej 10mb</h4>
@@ -133,6 +133,7 @@ export default {
       insuranceTypeId: '',
       description: '',
       status: 'Nowy',
+      submissionDate: new Date().toISOString(),
       additionalNotes: '',
       decisionReason: ''
     });
@@ -140,8 +141,8 @@ export default {
     const loadInitialData = async () => {
       try {
         const [typesResponse, customersResponse] = await Promise.all([
-          axios.get('api/InsuranceTypes/ShowAllTypes'),
-          axios.get('api/EndUsers/GetAllCustomers')
+          axios.get('/api/InsuranceTypes/ShowAllTypes'),
+          axios.get('/api/EndUsers/GetAllCustomers')
         ]);
 
         if (typesResponse.data.success) {
@@ -181,11 +182,15 @@ export default {
         .map(async (fileData) => {
           const formData = new FormData();
           formData.append('file', fileData.file);
-          formData.append('reportId', reportId);
+          formData.append('reportId', reportId.toString());
           formData.append('description', fileData.description);
 
           try {
-            await axios.post('api/InsuranceDocuments/UploadDocument', formData);
+            await axios.post('/api/InsuranceDocuments/UploadDocument', formData, {
+              headers: {
+                'Content-Type': 'multipart/form-data'
+              }
+            });
           } catch (err) {
             console.error('Błąd ładowania dokumentu:', err);
             throw new Error('Nie udało się załadować dokumentu');
@@ -200,9 +205,19 @@ export default {
         loading.value = true;
         error.value = null;
 
+        const reportData = {
+          endUserId: parseInt(formData.value.endUserId),
+          insuranceTypeId: parseInt(formData.value.insuranceTypeId),
+          description: formData.value.description,
+          status: 'Nowy',
+          submissionDate: new Date().toISOString(), 
+          additionalNotes: formData.value.additionalNotes || '',
+          decisionReason: formData.value.decisionReason || ''
+        };
+        console.log('Submitting report data:', JSON.stringify(reportData, null, 2));
         // Tutaj się tworzy
-        const response = await axios.post('api/InsuranceReports/CreateReport', formData.value);
-
+        const response = await axios.post('/api/InsuranceReports/CreateReport', reportData);
+        console.log('Report creation response:', response);
         if (response.data.success) {
           // I tutaj dokumenty dodaje, jak są
           const hasFiles = files.value.some(f => f.file);
@@ -216,7 +231,11 @@ export default {
           error.value = response.data.message;
         }
       } catch (err) {
-        console.error('Błąd tworzenia raportu:', err);
+        console.error('Błąd tworzenia raportu:', {
+          message: err.message,
+          response: err.response?.data,
+          status: err.response?.status
+        });
         error.value = 'Błąd tworzenia raportu';
       } finally {
         loading.value = false;

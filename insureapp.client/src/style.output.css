@@ -818,8 +818,16 @@ select {
   margin-top: 1.5rem;
 }
 
+.mb-8 {
+  margin-bottom: 2rem;
+}
+
 .block {
   display: block;
+}
+
+.inline-block {
+  display: inline-block;
 }
 
 .flex {
@@ -858,6 +866,10 @@ select {
   max-height: 90vh;
 }
 
+.min-h-screen {
+  min-height: 100vh;
+}
+
 .w-4 {
   width: 1rem;
 }
@@ -878,12 +890,20 @@ select {
   width: 100%;
 }
 
+.w-32 {
+  width: 8rem;
+}
+
 .min-w-0 {
   min-width: 0px;
 }
 
 .min-w-full {
   min-width: 100%;
+}
+
+.min-w-80 {
+  min-width: 20rem;
 }
 
 .max-w-2xl {
@@ -906,8 +926,20 @@ select {
   max-width: 1280px;
 }
 
+.max-w-screen-lg {
+  max-width: 1024px;
+}
+
+.max-w-full {
+  max-width: 100%;
+}
+
 .flex-1 {
   flex: 1 1 0%;
+}
+
+.flex-auto {
+  flex: 1 1 auto;
 }
 
 .flex-shrink-0 {
@@ -915,6 +947,10 @@ select {
 }
 
 .flex-grow {
+  flex-grow: 1;
+}
+
+.grow {
   flex-grow: 1;
 }
 
@@ -1151,6 +1187,10 @@ select {
   fill: #d4d4d4;
 }
 
+.stroke-zinc-700 {
+  stroke: #3f3f46;
+}
+
 .p-4 {
   padding: 1rem;
 }
@@ -1230,6 +1270,11 @@ select {
 .text-xs {
   font-size: 0.75rem;
   line-height: 1rem;
+}
+
+.text-6xl {
+  font-size: 3.75rem;
+  line-height: 1;
 }
 
 .font-bold {
