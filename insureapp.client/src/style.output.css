@@ -834,6 +834,7 @@ select {
   display: flex;
 }
 
+
 .inline-flex {
   display: inline-flex;
 }
@@ -841,6 +842,7 @@ select {
 .table {
   display: table;
 }
+
 
 .grid {
   display: grid;
@@ -1081,6 +1083,7 @@ select {
 
 .rounded-md {
   border-radius: 0.375rem;
+
 }
 
 .border {
@@ -1275,12 +1278,12 @@ select {
 .text-6xl {
   font-size: 3.75rem;
   line-height: 1;
+
 }
 
 .font-bold {
   font-weight: 700;
 }
-
 .font-medium {
   font-weight: 500;
 }

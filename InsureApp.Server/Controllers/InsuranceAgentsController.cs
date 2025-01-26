@@ -59,7 +59,7 @@ namespace InsureApp.Server.Controllers
             var insuranceAgent = await _db.InsuranceAgents.FindAsync(id);
 
 
-            if (insuranceAgent == null)
+            if (endUser == null)
             {
                 return NotFound(new ApiResponse<object>
                 {
@@ -348,6 +348,7 @@ namespace InsureApp.Server.Controllers
                     Message = $"Użytkownik o {id} skasowany"
                 });
             }
+
         }
 
         private bool InsuranceAgentExists(int id)

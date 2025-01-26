@@ -57,6 +57,7 @@ namespace InsureApp.Server.Controllers
         [HttpGet("{id}")]
         [ActionName("GetUserByID")]
         public async Task<ActionResult<ApiResponse<EndUser>>> GetEndUser(int id)
+
         {
             var endUser = await _db.EndUsers.FindAsync(id);
             
