@@ -38,15 +38,17 @@ export default defineConfig({
     plugins: [plugin()],
     resolve: {
         alias: {
-            '@': fileURLToPath(new URL('./src', import.meta.url))
+        '@': fileURLToPath(new URL('./src', import.meta.url))
+        //'@': path.resolve(__dirname, './src')
         }
     },
     server: {
         proxy: {
-            '^/weatherforecast': {
-                target,
-                secure: false
-            }
+        '/api': {
+            target: 'https://localhost:7038',
+            changeOrigin: true,
+            secure: false
+        }
         },
         port: 5173,
         https: {

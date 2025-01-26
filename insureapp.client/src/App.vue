@@ -1,49 +1,77 @@
-<script setup>
-import HelloWorld from './components/HelloWorld.vue'
-import TheWelcome from './components/TheWelcome.vue'
+<script>
+  export default {
+    name: 'App'
+  }
 </script>
 
 <template>
-  <header>
-    <img alt="Vue logo" class="logo" src="./assets/logo.svg" width="125" height="125" />
-    <h1 class="text-3xl font-bold underline">
-      Hello world!
-    </h1>
-    <div class="wrapper">
-      <HelloWorld msg="You did it!" />
-    </div>
-  </header>
+  <div class="flex h-screen max-w bg-gray-100">
+    <!-- Sidebar -->
+    <aside class="w-56 flex-shrink-0 bg-gray-800 text-white">
+      <div class="p-4">
+        <h1 class="text-xl font-bold">InsureApp</h1>
+      </div>
 
-  <main>
-    <TheWelcome />
-  </main>
+      <!-- Nawigator -->
+      <nav class="mt-4">
+        <!-- SEKCJA RAPORTY -->
+        <div class="px-4 py-2">
+          <h2 class="text-xs uppercase tracking-wide text-gray-400">Zgłoszenia szkód</h2>
+          <router-link to="/reports" class="block px-4 py-2 mt-2 text-sm hover:bg-gray-700 rounded">
+            Wszystkie zgłoszenia
+          </router-link>
+          <router-link to="/reports/new" class="block px-4 py-2 mt-1 text-sm hover:bg-gray-700 rounded">
+            Utwórz zgłoszenie
+          </router-link>
+        </div>
+
+        <!-- ZARZĄDZANIE KLIENTAMI -->
+        <div class="px-4 py-2 mt-4">
+          <h2 class="text-xs uppercase tracking-wide text-gray-400">Zarządzanie Klientami</h2>
+          <router-link to="/users" class="block px-4 py-2 mt-2 text-sm hover:bg-gray-700 rounded">
+            Wszyscy klienci
+          </router-link>
+          <router-link to="/users/new" class="block px-4 py-2 mt-1 text-sm hover:bg-gray-700 rounded">
+            Dodaj klienta ręcznie
+          </router-link>
+        </div>
+
+        <!-- ZARZĄDZANIE AGENTAMI -->
+        <div class="px-4 py-2 mt-4">
+          <h2 class="text-xs uppercase tracking-wide text-gray-400">Agenci ubezpieczeniowi</h2>
+          <router-link to="/agents" class="block px-4 py-2 mt-2 text-sm hover:bg-gray-700 rounded">
+            Wszyscy agenci
+          </router-link>
+          <router-link to="/agents/new" class="block px-4 py-2 mt-1 text-sm hover:bg-gray-700 rounded">
+            Dodaj agenta ręcznie
+          </router-link>
+        </div>
+
+        <!-- TYPY UBEZPIECZEń -->
+        <div class="px-4 py-2 mt-4">
+          <h2 class="text-xs uppercase tracking-wide text-gray-400">Typy ubezpieczeń</h2>
+          <router-link to="/insurance-types" class="block px-4 py-2 mt-2 text-sm hover:bg-gray-700 rounded">
+            Zarządzanie typami
+          </router-link>
+        </div>
+      </nav>
+    </aside>
+
+    <!-- Content -->
+    <main class="flex w-screen min-w-0">
+      <!-- TOP BAR -->
+     <!-- <div class="bg-white shadow-sm">
+        <div class="px-6 py-4">
+          <h1 class="text-xl font-semibold stroke-zinc-700">Dashboard</h1>
+        </div>
+      </div>-->
+
+      <!-- Strona z router -->
+      <div class="p-6 flex overflow-x-hidden">
+        <div class="flex-1">
+          <router-view></router-view>
+        </div>
+        </div>
+    </main>
+  </div>
 </template>
-
-<style scoped>
-header {
-  line-height: 1.5;
-}
-
-.logo {
-  display: block;
-  margin: 0 auto 2rem;
-}
-
-@media (min-width: 1024px) {
-  header {
-    display: flex;
-    place-items: center;
-    padding-right: calc(var(--section-gap) / 2);
-  }
-
-  .logo {
-    margin: 0 2rem 0 0;
-  }
-
-  header .wrapper {
-    display: flex;
-    place-items: flex-start;
-    flex-wrap: wrap;
-  }
-}
-</style>

@@ -27,7 +27,7 @@ namespace InsureApp.Server.Controllers
        
         [HttpGet]
         [ActionName("GetAllCustomers")]
-        public async Task<ActionResult<IEnumerable<EndUser>>> GetEndUsers()
+        public async Task<ActionResult<ApiResponse<IEnumerable<EndUser>>>> GetEndUsers()
         {
             try
             {
@@ -56,7 +56,8 @@ namespace InsureApp.Server.Controllers
         // GET: api/EndUsers/5
         [HttpGet("{id}")]
         [ActionName("GetUserByID")]
-        public async Task<ActionResult<EndUser>> GetEndUser(int id)
+        public async Task<ActionResult<ApiResponse<EndUser>>> GetEndUser(int id)
+
         {
             var endUser = await _db.EndUsers.FindAsync(id);
             
@@ -85,7 +86,7 @@ namespace InsureApp.Server.Controllers
         //Znajdź po mailu
         [HttpGet]
         [ActionName("GetUserIDByMail")]
-        public async Task<ActionResult<EndUser>> GetUserByMail([FromQuery] string email)
+        public async Task<ActionResult<ApiResponse<EndUser>>> GetUserByMail([FromQuery] string email)
         {
             try
             {
@@ -127,7 +128,7 @@ namespace InsureApp.Server.Controllers
         // PUT
         [HttpPut("{id}")]
         [ActionName("EditUser")]
-        public async Task<IActionResult> PutEndUser(int id, EndUser endUser)
+        public async Task<ActionResult<ApiResponse<EndUser>>> PutEndUser(int id, EndUser endUser)
         {
             if (id != endUser.Id)
             {
@@ -211,10 +212,52 @@ namespace InsureApp.Server.Controllers
             }
         }
 
-        // POST: api/EndUsers
+        //Zrzutka raportów klienta
+        [HttpGet("{id}/reports")]
+        [ActionName("ShowReportsOf")]
+        public async Task<ActionResult<ApiResponse<IEnumerable<InsuranceReport>>>> GetEndUserReports(int id)
+        {
+            try
+            {
+                // Na wszelki - sprawdzenie czy istnieje
+                if (!await _db.EndUsers.AnyAsync(u => u.Id == id))
+                {
+                    return NotFound(new ApiResponse<IEnumerable<InsuranceReport>>
+                    {
+                        Success = false,
+                        Message = $"Klient z ID {id} nie istnieje",
+                        Data = null
+                    });
+                }
+
+                // Powiązane raporty
+                var reports = await _db.InsuranceReports
+                    .Include(r => r.InsuranceType)
+                    .Include(r => r.InsuranceAgent)
+                    .Where(r => r.EndUserId == id)
+                    .ToListAsync();
+
+                return Ok(new ApiResponse<IEnumerable<InsuranceReport>>
+                {
+                    Success = true,
+                    Message = $"Załadowano raporty w ilości {reports.Count} dla użytkownika {id}",
+                    Data = reports
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new ApiResponse<IEnumerable<InsuranceReport>>
+                {
+                    Success = false,
+                    Message = $"Pojawił się błąd {ex.Message}"
+                });
+            }
+        }
+
+        // POST
         [HttpPost]
         [ActionName("AddUserManually")]
-        public async Task<ActionResult<EndUser>> PostEndUser(EndUser endUser)
+        public async Task<ActionResult<ApiResponse<EndUser>>> PostEndUser(EndUser endUser)
         {
             if(!ModelState.IsValid)
             {
@@ -253,7 +296,7 @@ namespace InsureApp.Server.Controllers
                 await _db.SaveChangesAsync();
 
                 return CreatedAtAction(
-                    nameof(GetEndUser),
+                    "AddUserManually",
                     new { id = endUser.Id },
                     new ApiResponse<EndUser>
                     {
@@ -283,18 +326,28 @@ namespace InsureApp.Server.Controllers
         // DELETE: api/EndUsers/5
         [HttpDelete("{id}")]
         [ActionName("DeleteUser")]
-        public async Task<IActionResult> DeleteEndUser(int id)
+        public async Task<ActionResult<ApiResponse<EndUser>>> DeleteEndUser(int id)
         {
             var endUser = await _db.EndUsers.FindAsync(id);
             if (endUser == null)
             {
-                return NotFound();
+                return NotFound(new ApiResponse<object>
+                {
+                    Success = false,
+                    Message = $"Nie odnalazłem użytkownika o ID {id}"
+                });
             }
+            else
+            {
+                _db.EndUsers.Remove(endUser);
+                await _db.SaveChangesAsync();
 
-            _db.EndUsers.Remove(endUser);
-            await _db.SaveChangesAsync();
-
-            return NoContent();
+                return Ok(new ApiResponse<EndUser>
+                {
+                    Success = true,
+                    Message = $"Użytkownik o {id} skasowany"
+                });
+            }
         }
 
         private bool EndUserExists(int id)

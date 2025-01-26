@@ -4,6 +4,7 @@ using InsureApp.Server.Model;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace InsureApp.Server.Migrations
 {
     [DbContext(typeof(InsuranceDbContext))]
-    partial class InsuranceDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250125215340_smallOne")]
+    partial class smallOne
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -168,13 +171,13 @@ namespace InsureApp.Server.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("EndUserId")
+                    b.Property<int>("EndUserId")
                         .HasColumnType("int");
 
                     b.Property<int?>("InsuranceAgentId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("InsuranceTypeId")
+                    b.Property<int>("InsuranceTypeId")
                         .HasColumnType("int");
 
                     b.Property<string>("Status")
@@ -237,7 +240,8 @@ namespace InsureApp.Server.Migrations
                     b.HasOne("InsureApp.Server.Model.EndUser", "EndUser")
                         .WithMany("InsuranceReports")
                         .HasForeignKey("EndUserId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
 
                     b.HasOne("InsureApp.Server.Model.InsuranceAgent", "InsuranceAgent")
                         .WithMany("HandledReports")
@@ -247,7 +251,8 @@ namespace InsureApp.Server.Migrations
                     b.HasOne("InsureApp.Server.Model.InsuranceType", "InsuranceType")
                         .WithMany("InsuranceReports")
                         .HasForeignKey("InsuranceTypeId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
 
                     b.Navigation("EndUser");
 
