@@ -59,7 +59,7 @@ namespace InsureApp.Server.Controllers
             var insuranceAgent = await _db.InsuranceAgents.FindAsync(id);
 
 
-            if (endUser == null)
+            if (insuranceAgent == null)
             {
                 return NotFound(new ApiResponse<object>
                 {
